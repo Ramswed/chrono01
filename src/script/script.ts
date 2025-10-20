@@ -5,6 +5,7 @@ const now = new Date();
 const month = String(now.getMonth() + 1).padStart(2, "0");
 const date = String(now.getDate()).padStart(2, "0");
 
+//fonction pour calcluler la durée de la semaine
 function calculDureeSemaine(): Promise<string> {
   return new Promise((resolve, reject) => {
     let interval = setInterval(() => {
@@ -35,6 +36,7 @@ function calculDureeSemaine(): Promise<string> {
   });
 }
 
+//fonciton pour calculer la durée de connexion
 function calculDureeLog(): Promise<string> {
   return new Promise((resolve, reject) => {
     let interval = setInterval(() => {
