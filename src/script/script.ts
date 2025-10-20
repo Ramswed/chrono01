@@ -1,301 +1,239 @@
-console.log("test");
+(() => {
+  console.log("📦 Script d'émargement lancé");
 
-const now = new Date();
-
-const month = String(now.getMonth() + 1).padStart(2, "0");
-const date = String(now.getDate()).padStart(2, "0");
-
-//fonction pour calcluler la durée de la semaine
-function calculDureeSemaine(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let interval = setInterval(() => {
-      const tbody = document.getElementById("tbodyWeekCalendar");
-      if (tbody && tbody.children.length > 0) {
-        clearInterval(interval);
-
-        const lignes = tbody.children;
-        for (let i = 0; i < lignes.length; i++) {
-          const ligne = lignes[i];
-          const colonnes = ligne.children;
-          for (let j = 0; j < colonnes.length; j++) {
-            const cellule = colonnes[j];
-            const text = cellule?.firstElementChild?.textContent;
-            if (text) {
-              const [jour, mois] = text.split("/");
-              if (jour.trim() === date.trim() && mois.trim() === month.trim()) {
-                const result = colonnes[8].textContent + ":00";
-                resolve(result);
-                return;
-              }
-            }
-          }
-        }
-        reject("Aucune cellule avec date trouvée");
-      }
-    }, 300);
-  });
-}
-
-//fonciton pour calculer la durée de connexion
-function calculDureeLog(): Promise<string> {
-  return new Promise((resolve, reject) => {
-    let interval = setInterval(() => {
-      const logTable = document.getElementById("logTable");
-      const clock = document.getElementById("clock");
-      if (logTable && logTable.children.length > 0 && clock) {
-        clearInterval(interval);
-        const finalClock = clock.textContent;
-
-        const lignes = logTable.children;
-        for (let i = 0; i < lignes.length; i++) {
-          const ligne = lignes[i];
-          const colonnes = ligne.children;
-          for (let j = 0; j < colonnes.length; j++) {
-            const cellule = colonnes[j];
-            if (i === 1 && j === 0) {
-              const logTime = cellule?.children[1]?.textContent;
-              if (finalClock && logTime) {
-                const transition =
-                  convertirHeureEnSecondes(finalClock) -
-                  convertirHeureEnSecondes(logTime);
-                const result = convertirSecondesEnHeure(transition);
-                resolve(result);
-                return;
-              } else {
-                reject("Horloges manquantes");
-                return;
-              }
-            }
-          }
-        }
-        reject("Pas de cellule log trouvée");
-      }
-    }, 300);
-  });
-}
-
-function convertirHeureEnSecondes(heureStr: string | null): number {
-  if (heureStr === null) {
-    throw new Error("L'heure ne peut pas être nulle");
+  function formatHours(decimalHours: number): string {
+    const hours = Math.floor(decimalHours);
+    const minutes = Math.round((decimalHours - hours) * 60);
+    return `${hours}h ${minutes}min`;
   }
 
-  console.log("valeur de heureStr :", heureStr);
-  const regex = /^(\d{1,2}):(\d{2}):(\d{2})$/;
-  const match = heureStr.match(regex);
-
-  if (!match) {
-    throw new Error("Format d'heure invalide. Utilise HH:MM:SS");
+  function formatLiveTime(decimalHours: number): string {
+    const hours = Math.floor(decimalHours);
+    const totalMinutes = decimalHours * 60;
+    const minutes = Math.floor(totalMinutes % 60);
+    const seconds = Math.floor((totalMinutes * 60) % 60);
+    return `${hours}h ${minutes}min ${seconds}s`;
   }
 
-  const h = Number(match[1]);
-  const m = Number(match[2]);
-  const s = Number(match[3]);
-  return h * 3600 + m * 60 + s;
-}
+  function formatFullTime(decimalHours: number): string {
+    const hours = Math.floor(decimalHours);
+    const totalMinutes = decimalHours * 60;
+    const minutes = Math.floor(totalMinutes % 60);
+    const seconds = Math.floor((totalMinutes * 60) % 60);
+    return `${hours}h ${minutes}min ${seconds}s`;
+  }
 
-function convertirSecondesEnHeure(totalSecondes: number): string {
-  const heures = Math.floor(totalSecondes / 3600);
-  const minutes = Math.floor((totalSecondes % 3600) / 60);
-  const secondes = totalSecondes % 60;
+  function parseDuration(text: string): number {
+    if (!text || !text.includes(":")) return 0;
+    const [h, m, s] = text.split(":").map(Number);
+    return h + m / 60 + s / 3600;
+  }
 
-  // On formate avec padStart pour avoir 2 chiffres
-  return `${String(heures).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0"
-  )}:${String(secondes).padStart(2, "0")}`;
-}
+  function getStartTimeFromRow(row: HTMLTableRowElement): Date | null {
+    const cells = row.querySelectorAll("td");
+    const startText = cells[1]?.textContent?.trim() || "";
+    const endText = cells[2]?.textContent?.trim() || "";
+    if (endText === "-") {
+      const [h, m, s] = startText.split(":").map(Number);
+      const now = new Date();
+      return new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        h,
+        m,
+        s
+      );
+    }
+    return null;
+  }
 
-const container = document.createElement("div");
-container.id = "fixed-widget";
+  function updateWidget(startTime: Date | null) {
+    const rows = document.querySelectorAll<HTMLTableRowElement>("tbody tr");
+    const weeklyHours: number[] = [];
+    const todayHours: number[] = [];
 
-// Styles CSS directement en JS
-Object.assign(container.style, {
-  position: "fixed",
-  bottom: "10px",
-  right: "10px",
-  width: "350px",
-  height: "250px",
-  background:
-    "linear-gradient(180deg, #ffffff, #e3f3eb, #c6e7d7, #a9dbc3, #8cceb0, #6cc29d, #49b58a, #08a878)",
-  color: "#1a3b34",
-  padding: "10px",
-  borderRadius: "8px",
-  zIndex: "99999",
-  boxSizing: "border-box",
-  fontFamily: "Arial, sans-serif",
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "column",
-  gap: "10%",
-});
+    const now = new Date();
+    const currentMonday = new Date(now);
+    currentMonday.setDate(now.getDate() - ((now.getDay() + 6) % 7));
+    currentMonday.setHours(0, 0, 0, 0);
 
-const title = document.createElement("div");
-title.id = "tite";
-title.textContent = "Progression sur 35h";
-Object.assign(title.style, {
-  fontWeight: "bold",
-});
+    rows.forEach((row) => {
+      const cells = row.querySelectorAll("td");
+      if (cells.length < 4) return;
 
-const progressBarZone = document.createElement("div");
-progressBarZone.id = "progressBarZone";
+      const dateText = cells[0]?.textContent?.trim() || "";
+      const dateParts = dateText.split(" ");
+      if (dateParts.length < 4) return;
 
-Object.assign(progressBarZone.style, {
-  width: "100%",
-  height: "20px",
-  display: "flex",
-  alignItem: "center",
-  justifyContent: "center",
-  flexDirection: "row",
-  gap: "5%",
-});
+      const day = parseInt(dateParts[1]);
+      const monthName = dateParts[2].toLowerCase();
+      const year = parseInt(dateParts[3]);
+      const monthMap: Record<string, number> = {
+        janvier: 0,
+        février: 1,
+        mars: 2,
+        avril: 3,
+        mai: 4,
+        juin: 5,
+        juillet: 6,
+        août: 7,
+        septembre: 8,
+        octobre: 9,
+        novembre: 10,
+        décembre: 11,
+      };
 
-const progressBar = document.createElement("div");
-progressBar.id = "progressBar";
+      const month: number | undefined = monthMap[monthName];
+      if (month === undefined || isNaN(day) || isNaN(year)) return;
 
-Object.assign(progressBar.style, {
-  width: "238px",
-  height: "16px",
-  borderWidth: "2px",
-  borderColor: "rgb(23 20 20)",
-  borderStyle: "solid",
-  borderRadius: "20px",
-  overflow: "hidden",
-});
+      const rowDate = new Date(year, month, day);
+      rowDate.setHours(0, 0, 0, 0);
 
-const innerProgressBar = document.createElement("div");
-innerProgressBar.id = "innerProgressBar";
+      if (rowDate >= currentMonday && rowDate <= now) {
+        const durationText = cells[3]?.textContent?.trim() || "";
+        const endText = cells[2]?.textContent?.trim() || "";
 
-Object.assign(innerProgressBar.style, {
-  height: "14.5px",
-  width: "0px",
-  backgroundColor: " #08a878",
-  transition: "width 0.5s ease 0.25s",
-  borderRadius: "20px",
-});
+        if (durationText.includes(":")) {
+          const duration = parseDuration(durationText);
+          if (!isNaN(duration)) {
+            weeklyHours.push(duration);
+          }
 
-const pourcentage = document.createElement("div");
-pourcentage.id = "pourcentage";
+          const isToday =
+            rowDate.getTime() ===
+            new Date(
+              now.getFullYear(),
+              now.getMonth(),
+              now.getDate()
+            ).getTime();
+          if (isToday) {
+            todayHours.push(duration);
+          }
+        }
 
-pourcentage.innerText = "...%";
-
-Object.assign(pourcentage.style, {
-  height: "14.5px",
-  width: "30px",
-});
-
-const zoneHeureSemaine = document.createElement("div");
-zoneHeureSemaine.id = "zoneHeureSemaine";
-Object.assign(zoneHeureSemaine.style, {
-  display: "flex",
-  flexDirection: "row",
-  gap: "5px",
-});
-
-const titreHeureSemaine = document.createElement("div");
-titreHeureSemaine.id = "titreSemain";
-titreHeureSemaine.textContent = "Soit : ";
-Object.assign(titreHeureSemaine.style, {});
-
-const heureSemaine = document.createElement("div");
-heureSemaine.id = "semain";
-heureSemaine.textContent = " ... ";
-Object.assign(heureSemaine.style, {
-  fontWeight: "bold",
-  color: "#08a878",
-});
-
-const notationHeureSemaine = document.createElement("div");
-notationHeureSemaine.id = "semain";
-notationHeureSemaine.textContent = " / 35:00:00";
-Object.assign(notationHeureSemaine.style, {});
-
-const zoneHeureDuJour = document.createElement("div");
-zoneHeureDuJour.id = "zoneHeureDuJour";
-Object.assign(zoneHeureDuJour.style, {
-  display: "flex",
-  flexDirection: "row",
-  gap: "5px",
-});
-
-const titreHeureDuJour = document.createElement("div");
-titreHeureDuJour.id = "en-tete";
-titreHeureDuJour.textContent = "Today log :";
-Object.assign(titreHeureDuJour.style, {});
-
-const heureDuJour = document.createElement("div");
-heureDuJour.id = "en-tete";
-heureDuJour.textContent = "calcul...";
-Object.assign(heureDuJour.style, {
-  fontWeight: "bold",
-  color: "rgb(20 21 21)",
-});
-
-const timeleft = document.createElement("div");
-timeleft.id = "timeleft";
-timeleft.textContent = "Il reste...";
-Object.assign(timeleft.style, {});
-
-document.body.appendChild(container);
-//container.appendChild(icon);
-container.appendChild(title);
-progressBar.appendChild(innerProgressBar);
-progressBarZone.appendChild(progressBar);
-progressBarZone.appendChild(pourcentage);
-container.appendChild(progressBarZone);
-
-zoneHeureSemaine.appendChild(titreHeureSemaine);
-zoneHeureSemaine.appendChild(heureSemaine);
-zoneHeureSemaine.appendChild(notationHeureSemaine);
-
-container.appendChild(zoneHeureSemaine);
-container.appendChild(timeleft);
-
-zoneHeureDuJour.appendChild(titreHeureDuJour);
-zoneHeureDuJour.appendChild(heureDuJour);
-container.appendChild(zoneHeureDuJour);
-
-function mettreAJourProgression() {
-  let tempsAccomplie: string;
-
-  Promise.all([calculDureeSemaine(), calculDureeLog()])
-    .then(([resSemaine, resToday]) => {
-      const Semaine = convertirHeureEnSecondes(resSemaine);
-      const today = convertirHeureEnSecondes(resToday);
-
-      heureDuJour.textContent = ` ${resToday}`;
-      zoneHeureDuJour.appendChild(heureDuJour);
-
-      const totalSecondes = today + Semaine;
-      const totalEnHeure = convertirSecondesEnHeure(totalSecondes);
-      tempsAccomplie = totalEnHeure; // ou un format lisible
-      heureSemaine.textContent = ` ${tempsAccomplie} `;
-      console.log("Temps accompli :", tempsAccomplie);
-
-      // modification de la barre de progression
-      const widthInnerProgressBar = (totalSecondes * 238) / 126000;
-      innerProgressBar.style.width = `${widthInnerProgressBar}px`;
-
-      //modification du pourcentage
-      const progressPourcentage = Math.floor((totalSecondes * 100) / 126000);
-      pourcentage.innerText = `${progressPourcentage}%`;
-
-      // temps restant
-      if (126000 - totalSecondes <= 0) {
-        const tempsRestant = convertirSecondesEnHeure(0);
-        timeleft.innerText = `Time left :${tempsRestant}`;
-      } else {
-        const tempsRestant = convertirSecondesEnHeure(126000 - totalSecondes);
-        timeleft.innerText = `Time left :${tempsRestant}`;
+        if (endText === "-" && !startTime) {
+          startTime = getStartTimeFromRow(row);
+        }
       }
-    })
-    .catch((err) => {
-      console.error("Erreur :", err);
     });
-}
 
-// Appel initial
-setTimeout(() => {
-  mettreAJourProgression();
-  setInterval(mettreAJourProgression, 1000); // toutes les 60 secondes
-}, 1000); // petit délai pour être sûr que le DOM est prêt
+    const sessionHours = startTime
+      ? (now.getTime() - startTime.getTime()) / 3600000
+      : 0;
+
+    const totalLogged = weeklyHours.reduce((a, b) => a + b, 0) + sessionHours;
+    const totalToday = todayHours.reduce((a, b) => a + b, 0) + sessionHours;
+    const remaining = 35 - totalLogged;
+
+    // Récupération des éléments du widget
+    const innerProgressBar = document.getElementById(
+      "innerProgressBar"
+    ) as HTMLDivElement;
+    const pourcentage = document.getElementById(
+      "progressPercentage"
+    ) as HTMLDivElement;
+    const heureSemaine = document.getElementById(
+      "heureSemaine"
+    ) as HTMLDivElement;
+    const heureDuJour = document.getElementById(
+      "heureDuJour"
+    ) as HTMLDivElement;
+    const timeleft = document.getElementById("timeleft") as HTMLDivElement;
+
+    if (
+      !innerProgressBar ||
+      !pourcentage ||
+      !heureSemaine ||
+      !heureDuJour ||
+      !timeleft
+    )
+      return;
+
+    // Mise à jour des valeurs du widget
+    const totalSeconds = totalLogged * 3600;
+    const progressRatio = Math.min(totalSeconds / 126000, 1); // 35h = 126000s
+    innerProgressBar.style.width = `${238 * progressRatio}px`;
+
+    pourcentage.textContent = `${Math.floor(progressRatio * 100)}%`;
+    heureSemaine.textContent = `${formatFullTime(totalLogged)}`;
+    heureDuJour.textContent = `${formatFullTime(totalToday)}`;
+    timeleft.textContent = `Il reste : ${formatFullTime(
+      Math.max(0, remaining)
+    )}`;
+
+    // Session en cours avec point clignotant
+    const liveTime = startTime ? formatLiveTime(sessionHours) : "N/A";
+    const blink = `<span style="color:#00ff88; animation: blink 1s infinite;">●</span>`;
+    timeleft.innerHTML += ` <strong>Session :</strong> ${liveTime} ${blink}`;
+  }
+
+  function initWidget() {
+    const rows = document.querySelectorAll<HTMLTableRowElement>("tbody tr");
+
+    console.log("📊 Lignes trouvées :", rows.length);
+
+    if (rows.length === 0) {
+      console.log("❌ Aucune ligne trouvée, abandon");
+      return;
+    }
+
+    const widget = document.createElement("div");
+    widget.id = "emargement-widget";
+    widget.style.position = "fixed";
+    widget.style.bottom = "15px";
+    widget.style.right = "15px";
+    widget.style.background = "rgba(0, 0, 0, 0.75)";
+    widget.style.color = "white";
+    widget.style.padding = "12px";
+    widget.style.borderRadius = "8px";
+    widget.style.fontFamily = "sans-serif";
+    widget.style.fontSize = "14px";
+    widget.style.zIndex = "9999";
+
+    const style = document.createElement("style");
+    style.textContent = `
+      @keyframes blink {
+        0% { opacity: 1; }
+        50% { opacity: 0.2; }
+        100% { opacity: 1; }
+      }
+    `;
+    document.head.appendChild(style);
+
+    document.body.appendChild(widget);
+    console.log("🧱 Widget créé");
+
+    let startTime = null;
+    updateWidget(startTime);
+    setInterval(() => updateWidget(startTime), 1000);
+  }
+
+  function waitForTable() {
+    let tries = 0;
+    const maxTries = 60;
+
+    const interval = setInterval(() => {
+      const rows = document.querySelectorAll<HTMLTableRowElement>("tbody tr");
+      if (rows.length > 0) {
+        console.log("✅ Tableau détecté après attente");
+        clearInterval(interval);
+        initWidget();
+      } else {
+        tries++;
+        console.log(`⏳ Attente du tableau... (${tries}/${maxTries})`);
+        if (tries >= maxTries) {
+          console.log("❌ Tableau non détecté après délai");
+          clearInterval(interval);
+        }
+      }
+    }, 500);
+  }
+
+  document.addEventListener("readystatechange", () => {
+    if (document.readyState === "complete") {
+      console.log("⏳ DOM complet, démarrage de la boucle de détection");
+      waitForTable();
+    }
+  });
+})();
