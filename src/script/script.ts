@@ -183,13 +183,65 @@
     widget.style.position = "fixed";
     widget.style.bottom = "15px";
     widget.style.right = "15px";
-    widget.style.background = "rgba(0, 0, 0, 0.75)";
+    widget.style.width = "280px";
+    widget.style.height = "210px";
+    widget.style.background = "rgba(94, 221, 26, 0.75)";
     widget.style.color = "white";
     widget.style.padding = "12px";
     widget.style.borderRadius = "8px";
     widget.style.fontFamily = "sans-serif";
     widget.style.fontSize = "14px";
     widget.style.zIndex = "9999";
+
+    // 📊 Barre de progression
+    const progressContainer = document.createElement("div");
+    progressContainer.style.width = "100%";
+    progressContainer.style.height = "10px";
+    progressContainer.style.background = "#333";
+    progressContainer.style.borderRadius = "5px";
+    progressContainer.style.marginBottom = "10px";
+    progressContainer.style.overflow = "hidden";
+
+    const innerProgressBar = document.createElement("div");
+    innerProgressBar.id = "innerProgressBar";
+    innerProgressBar.style.width = "0%";
+    innerProgressBar.style.height = "100%";
+    innerProgressBar.style.background = "#00b894";
+    innerProgressBar.style.transition = "width 0.5s ease";
+    progressContainer.appendChild(innerProgressBar);
+
+    // % de progression
+    const progressPercentage = document.createElement("div");
+    progressPercentage.id = "progressPercentage";
+    progressPercentage.style.textAlign = "right";
+    progressPercentage.style.marginBottom = "8px";
+    progressPercentage.style.fontSize = "14px";
+    progressPercentage.textContent = "0%";
+
+    // 📅 Heures cumulées
+    const heureSemaine = document.createElement("div");
+    heureSemaine.id = "heureSemaine";
+    heureSemaine.textContent = "Semaine : 00h00";
+
+    const heureDuJour = document.createElement("div");
+    heureDuJour.id = "heureDuJour";
+    heureDuJour.textContent = "Aujourd’hui : 00h00";
+
+    const timeleft = document.createElement("div");
+    timeleft.id = "timeleft";
+    timeleft.textContent = "Restant : 00h00";
+
+    const sessionDiv = document.createElement("div");
+    sessionDiv.id = "widget-session";
+    sessionDiv.textContent = "Session en cours : 00h00";
+
+    // 🧩 Assemblage
+    widget.appendChild(progressContainer);
+    widget.appendChild(progressPercentage);
+    widget.appendChild(heureSemaine);
+    widget.appendChild(heureDuJour);
+    widget.appendChild(timeleft);
+    widget.appendChild(sessionDiv);
 
     const style = document.createElement("style");
     style.textContent = `
