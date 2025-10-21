@@ -155,17 +155,28 @@
     const progressRatio = Math.min(totalSeconds / 126000, 1); // 35h = 126000s
     innerProgressBar.style.width = `${238 * progressRatio}px`;
 
+    // Mise à jour du contenu du widget
     pourcentage.textContent = `${Math.floor(progressRatio * 100)}%`;
-    heureSemaine.textContent = `${formatFullTime(totalLogged)}`;
-    heureDuJour.textContent = `${formatFullTime(totalToday)}`;
-    timeleft.textContent = `Il reste : ${formatFullTime(
-      Math.max(0, remaining)
-    )}`;
+
+    heureSemaine.innerHTML = `
+  <strong style="color:#d7ffd0; font-weight:600;">Heure de la semaine :</strong> 
+  <span style="color:#ffffff;">${formatFullTime(totalLogged)}</span>
+`;
+
+    heureDuJour.innerHTML = `
+  <strong style="color:#d7ffd0; font-weight:600;">Heure du jour :</strong> 
+  <span style="color:#ffffff;">${formatFullTime(totalToday)}</span>
+`;
+
+    timeleft.innerHTML = `
+  <strong style="color:#d7ffd0; font-weight:600;">Il reste :</strong> 
+  <span style="color:#ffffff;">${formatFullTime(Math.max(0, remaining))}</span>
+`;
 
     // Session en cours avec point clignotant
     const liveTime = startTime ? formatLiveTime(sessionHours) : "N/A";
     const blink = `<span style="color:#00ff88; animation: blink 1s infinite;">●</span>`;
-    timeleft.innerHTML += ` <strong>Session :</strong> ${liveTime} ${blink}`;
+    timeleft.innerHTML += ` ${blink}`;
   }
 
   function initWidget() {
@@ -185,7 +196,9 @@
     widget.style.right = "15px";
     widget.style.width = "280px";
     widget.style.height = "210px";
-    widget.style.background = "rgba(94, 221, 26, 0.75)";
+    widget.style.background =
+      "linear-gradient(180deg, #29610c, #1b320e, #000000, #000000, #000000)";
+
     widget.style.color = "white";
     widget.style.padding = "12px";
     widget.style.borderRadius = "8px";
@@ -231,9 +244,25 @@
     timeleft.id = "timeleft";
     timeleft.textContent = "Restant : 00h00";
 
-    const sessionDiv = document.createElement("div");
-    sessionDiv.id = "widget-session";
-    sessionDiv.textContent = "Session en cours : 00h00";
+    //bouton de suppression
+    const closeBtn = document.createElement("button");
+
+    closeBtn.textContent = "❌";
+    closeBtn.title = "Fermer le widget";
+
+    Object.assign(closeBtn.style, {
+      position: "absolute",
+      top: "170px",
+      right: "8px",
+      background: "transparent",
+      color: "#fff",
+      border: "none",
+      fontSize: "18px",
+      cursor: "pointer",
+    });
+
+    closeBtn.onclick = toggleWidget;
+    widget.appendChild(closeBtn);
 
     // 🧩 Assemblage
     widget.appendChild(progressContainer);
@@ -241,7 +270,7 @@
     widget.appendChild(heureSemaine);
     widget.appendChild(heureDuJour);
     widget.appendChild(timeleft);
-    widget.appendChild(sessionDiv);
+    // widget.appendChild(sessionDiv);
 
     const style = document.createElement("style");
     style.textContent = `
@@ -259,6 +288,50 @@
     let startTime = null;
     updateWidget(startTime);
     setInterval(() => updateWidget(startTime), 1000);
+  }
+  function toggleWidget() {
+    const existingWidget = document.getElementById("emargement-widget");
+    const existingButton = document.getElementById("open-widget-btn");
+
+    // 🔒 Si le widget est visible → on le ferme
+    if (existingWidget) {
+      existingWidget.remove();
+
+      // Crée le petit bouton rond pour le rouvrir
+      const openBtn = document.createElement("button");
+      openBtn.id = "open-widget-btn";
+      openBtn.textContent = "🕒";
+      openBtn.title = "Ouvrir le widget";
+
+      Object.assign(openBtn.style, {
+        position: "fixed",
+        bottom: "20px",
+        right: "20px",
+        width: "45px",
+        height: "45px",
+        borderRadius: "50%",
+        border: "none",
+        background: "linear-gradient(180deg, #29610c, #1b320e, #000000)",
+        color: "#b2ff91",
+        fontSize: "22px",
+        boxShadow: "0 0 10px rgba(0,0,0,0.5)",
+        cursor: "pointer",
+        transition: "transform 0.2s ease",
+        zIndex: "9999",
+      });
+
+      openBtn.onmouseenter = () => (openBtn.style.transform = "scale(1.1)");
+      openBtn.onmouseleave = () => (openBtn.style.transform = "scale(1)");
+      openBtn.onclick = toggleWidget;
+
+      document.body.appendChild(openBtn);
+      return;
+    }
+
+    // 🔓 Si seul le bouton est présent → on le retire et on rouvre le widget
+    if (existingButton) existingButton.remove();
+
+    initWidget(); // 👈 remplace createWidget()
   }
 
   function waitForTable() {
