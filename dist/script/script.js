@@ -240,8 +240,8 @@
             openBtn.title = "Ouvrir le widget";
             Object.assign(openBtn.style, {
                 position: "fixed",
-                bottom: "20px",
-                right: "20px",
+                bottom: "70px",
+                right: "25px",
                 width: "45px",
                 height: "45px",
                 borderRadius: "50%",
