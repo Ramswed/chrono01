@@ -3,6 +3,7 @@
   "name": "Chrono01",
   "version": "1.1",
   "description": "Une extension Chrome qui fait la somme des heures.",
+  "permissions": ["storage"],
   "content_scripts": [
     {
       "matches": ["https://emargement.zone01normandie.org/dashboard"],

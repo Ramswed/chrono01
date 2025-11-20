@@ -244,12 +244,56 @@
     timeleft.id = "timeleft";
     timeleft.textContent = "Restant : 00h00";
 
+    // input texte pour entrer le nom
+    const textInput = document.createElement("input");
+    textInput.type = "text";
+    textInput.placeholder = "entrez votre nom";
+    Object.assign(textInput.style, {
+      position: "absolute",
+      top: "170px",
+      right: "160px",
+      width: "110px",
+      padding: "2px 6px",
+      borderRadius: "4px",
+      border: "1px solid #444",
+      background: "#222",
+      color: "#fff",
+      fontSize: "13px",
+      outline: "none",
+    });
+    widget.appendChild(textInput);
+
+    // bouton pour envoyer le texte
+    const sendBtn = document.createElement("button");
+    sendBtn.textContent = "Envoyer";
+    sendBtn.title = "Envoyer le texte";
+    Object.assign(sendBtn.style, {
+      position: "absolute",
+      top: "170px",
+      right: "90px",
+      background: "#00b894",
+      color: "#222",
+      border: "none",
+      borderRadius: "4px",
+      fontSize: "13px",
+      padding: "2px 8px",
+      cursor: "pointer",
+    });
+    sendBtn.onclick = () => {
+      const value = textInput.value.trim();
+      if (value) {
+        alert(`Texte envoyé : ${value}`);
+        textInput.value = "";
+      } else {
+        alert("Veuillez entrer un texte.");
+      }
+    };
+    widget.appendChild(sendBtn);
+
     //bouton de suppression
     const closeBtn = document.createElement("button");
-
     closeBtn.textContent = "❌";
     closeBtn.title = "Fermer le widget";
-
     Object.assign(closeBtn.style, {
       position: "absolute",
       top: "170px",
@@ -260,7 +304,6 @@
       fontSize: "18px",
       cursor: "pointer",
     });
-
     closeBtn.onclick = toggleWidget;
     widget.appendChild(closeBtn);
 
