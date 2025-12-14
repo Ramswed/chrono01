@@ -59,3 +59,7 @@ Si vous souhaitez modifier le code, les fichiers sources sont dans le dossier `s
 ## Licence
 
 Ce projet est distribué sous la licence MIT. Vous êtes libre de l'utiliser, le modifier et le distribuer comme bon vous semble. Voir le fichier LICENSE pour plus de détails.
+
+## Aperçu
+
+![Aperçu de l'extension](src/assets/apercu.png)
