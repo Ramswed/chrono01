@@ -12,7 +12,6 @@ export interface WeeklyStats {
   totalToday: number;
   remaining: number;
   sessionHours: number;
-  progressRatio: number;
 }
 
 export interface DebugInfo {
@@ -172,9 +171,6 @@ export function calculateWeeklyStats(
   const totalToday = todayHours.reduce((a, b) => a + b, 0) + sessionHours;
   const remaining = 35 - totalLogged;
 
-  const totalSeconds = totalLogged * 3600;
-  const progressRatio = Math.min(totalSeconds / 126000, 1);
-
   if (!(window as any).__chrono01_debug_logged) {
     const manualSum = weeklyHours.reduce((a, b) => a + b, 0);
 
@@ -207,6 +203,5 @@ export function calculateWeeklyStats(
     totalToday,
     remaining,
     sessionHours,
-    progressRatio,
   };
 }

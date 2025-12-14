@@ -1,4 +1,5 @@
 const esbuild = require("esbuild");
+const fs = require("fs");
 
 esbuild
   .build({
@@ -10,11 +11,17 @@ esbuild
     platform: "browser",
     sourcemap: false,
     minify: false,
+    legalComments: "none",
     define: {
       "process.env.NODE_ENV": '"production"',
     },
   })
   .then(() => {
+    const filePath = "dist/script/main.js";
+    let content = fs.readFileSync(filePath, "utf8");
+    content = content.replace(/^\s*\/\/.*$/gm, "");
+    content = content.replace(/\/\*[\s\S]*?\*\//g, "");
+    fs.writeFileSync(filePath, content, "utf8");
     console.log("✅ Build réussi !");
   })
   .catch((error) => {

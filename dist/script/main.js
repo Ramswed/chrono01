@@ -8,7 +8,6 @@
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
   };
 
-  // src/script/widget/toggle.ts
   function toggleWidget() {
     const existingWidget = document.getElementById("emargement-widget");
     const existingButton = document.getElementById("open-widget-btn");
@@ -97,7 +96,6 @@
     }
   });
 
-  // src/script/widget/widget.ts
   function createWidget() {
     injectGlobalStyles();
     const widget = document.createElement("div");
@@ -410,7 +408,6 @@
     }
   });
 
-  // src/script/utils/time.ts
   function formatFullTime(decimalHours) {
     const hours = Math.floor(decimalHours);
     const totalMinutes = decimalHours * 60;
@@ -429,7 +426,6 @@
     }
   });
 
-  // src/script/widget/updater.ts
   function updateWidgetContent(stats) {
     const heureSemaine = document.getElementById(
       "heureSemaine"
@@ -460,7 +456,6 @@
     }
   });
 
-  // src/script/utils/parser.ts
   function getStartTimeFromRow(row) {
     const cells = row.querySelectorAll("td");
     let startText = "";
@@ -479,7 +474,7 @@
     }
     if (endText === "-" && startText) {
       const [h, m, s] = startText.split(":").map(Number);
-      const now = /* @__PURE__ */ new Date();
+      const now =  new Date();
       return new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m, s);
     }
     return null;
@@ -572,7 +567,6 @@
     }
   });
 
-  // src/script/utils/calculator.ts
   function calculateWeeklyStats(rows) {
     const weeklyHours = [];
     const todayHours = [];
@@ -580,7 +574,7 @@
     let skippedRows = 0;
     let processedRows = 0;
     const skippedReasons = [];
-    const now = /* @__PURE__ */ new Date();
+    const now =  new Date();
     const currentMonday = new Date(now);
     currentMonday.setDate(now.getDate() - (now.getDay() + 6) % 7);
     currentMonday.setHours(0, 0, 0, 0);
@@ -674,8 +668,6 @@
     }
     const totalToday = todayHours.reduce((a, b) => a + b, 0) + sessionHours;
     const remaining = 35 - totalLogged;
-    const totalSeconds = totalLogged * 3600;
-    const progressRatio = Math.min(totalSeconds / 126e3, 1);
     if (!window.__chrono01_debug_logged) {
       const manualSum = weeklyHours.reduce((a, b) => a + b, 0);
       const debugInfo = {
@@ -701,8 +693,7 @@
       totalLogged,
       totalToday,
       remaining,
-      sessionHours,
-      progressRatio
+      sessionHours
     };
   }
   var init_calculator = __esm({
@@ -713,7 +704,6 @@
     }
   });
 
-  // src/script/widget/manager.ts
   function initWidget() {
     const rows = document.querySelectorAll("tbody tr");
     console.log("\u{1F4CA} Lignes trouv\xE9es :", rows.length);
@@ -769,7 +759,6 @@
     }
   });
 
-  // src/script/main.ts
   var require_main = __commonJS({
     "src/script/main.ts"() {
       init_manager();
