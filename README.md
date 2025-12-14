@@ -1,51 +1,61 @@
-# ⏱️ Chrono01
+# Chrono01 ˎˊ˗
 
-**Chrono01** est une extension développée pour suivre efficacement sa progression hebdomadaire sur la plateforme d'émargement de [Zone01](https://zone01normandie.org).  
-Elle permet une visualisation rapide et intuitive de votre activité, directement depuis le navigateur.
+Chrono01 est une extension de navigateur qui vous permet de suivre votre progression hebdomadaire sur la plateforme d'émargement de Zone01. Elle affiche directement dans votre navigateur un widget avec vos heures de la semaine, du jour, et le temps restant pour atteindre vos 35 heures hebdomadaires.
 
----
+## À propos
 
-## 🚀 Objectif
+Ce projet est un fork du travail original d'Erudit Aoué.
 
-Faciliter le suivi de votre progression sur Zone01 en offrant une interface visuelle claire et accessible.
+## Installation
 
-Fonctionnalités actuelles :
+### Prérequis
 
-- Affichage de la progression hebdomadaire
-- Visualisation intuitive de l’émargement
-- Intégration légère et rapide
+- Node.js installé sur votre machine
+- Un navigateur basé sur Chromium (Chrome, Brave, Edge, etc.)
 
----
+### Étapes d'installation
 
-## 📦 Installation
+1. Clonez ou téléchargez ce repository sur votre ordinateur
 
-> ⚠️ Extension non encore publiée sur un store. Pour l’instant, installation manuelle :
+2. Ouvrez un terminal dans le dossier du projet et installez les dépendances :
 
-1. Clonez ou téléchargez ce repo.
-2. Ouvrez `chrome://extensions/` (ou `brave://extensions/`, etc.)
-3. Activez le **mode développeur**.
-4. Cliquez sur **"Charger l’extension non empaquetée"**.
-5. Sélectionnez le dossier du projet.
+   ```bash
+   npm install
+   ```
 
----
+3. Compilez le projet TypeScript :
 
-## 🔓 Open Source
+   ```bash
+   npm run build
+   ```
 
-Ce projet est libre d’usage.  
-Vous pouvez en faire ce que vous voulez **dans les limites de la licence MIT**.  
-Aucune garantie n’est fournie, utilisez à vos propres risques.
+4. Ouvrez votre navigateur et allez sur la page des extensions :
 
----
+   - Chrome/Edge : `chrome://extensions/`
+   - Brave : `brave://extensions/`
 
-## ✍️ Auteur
+5. Activez le mode développeur (bouton en haut à droite)
 
-Développé par **Erudit Aoué**
+6. Cliquez sur "Charger l'extension non empaquetée" ou "Load unpacked"
 
-> Contact : grappercosmo@gmail.com
+7. Sélectionnez le dossier du projet (celui qui contient le fichier `manifest.json`)
 
----
+L'extension devrait maintenant être active. Elle se déclenchera automatiquement lorsque vous visiterez la page d'émargement de Zone01.
 
-## 📄 Licence
+## Utilisation
 
-Distribué sous la licence MIT.  
-Voir le fichier [LICENSE](./LICENSE) pour plus d’informations.
+Une fois installée, l'extension fonctionne automatiquement. Quand vous visitez votre tableau de bord d'émargement sur Zone01, un widget apparaît en bas à droite de l'écran avec :
+
+- Vos heures de la semaine
+- Vos heures du jour
+- Le temps restant pour atteindre 35 heures
+
+Le widget se met à jour en temps réel et prend en compte les sessions en cours.
+
+## Développement
+
+Si vous souhaitez modifier le code, les fichiers sources sont dans le dossier `src/`. Après chaque modification, vous devez recompiler avec `npm run build` et recharger l'extension dans votre navigateur.
+
+## Licence
+
+Ce projet est distribué sous la licence MIT. Vous êtes libre de l'utiliser, le modifier et le distribuer comme bon vous semble. Voir le fichier LICENSE pour plus de détails.

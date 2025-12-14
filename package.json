@@ -2,16 +2,17 @@
   "name": "chrono01",
   "version": "1.0.0",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "type": "commonjs",
   "description": "",
+  "scripts": {
+    "build": "node build.js"
+  },
   "devDependencies": {
     "@types/chrome": "^0.0.329",
+    "esbuild": "^0.27.1",
     "typescript": "^5.8.3"
   }
 }
