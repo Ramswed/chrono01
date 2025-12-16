@@ -161,12 +161,7 @@ export function calculateWeeklyStats(
 
   const weeklyTotal = weeklyHours.reduce((a, b) => a + b, 0);
 
-  let totalLogged: number;
-  if (totalFromSummary !== null && totalFromSummary > weeklyTotal) {
-    totalLogged = totalFromSummary + sessionHours;
-  } else {
-    totalLogged = weeklyTotal + sessionHours;
-  }
+  const totalLogged = weeklyTotal + sessionHours;
 
   const totalToday = todayHours.reduce((a, b) => a + b, 0) + sessionHours;
   const remaining = 35 - totalLogged;

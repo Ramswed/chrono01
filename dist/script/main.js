@@ -660,12 +660,7 @@
     });
     const sessionHours = startTime ? (now.getTime() - startTime.getTime()) / 36e5 : 0;
     const weeklyTotal = weeklyHours.reduce((a, b) => a + b, 0);
-    let totalLogged;
-    if (totalFromSummary !== null && totalFromSummary > weeklyTotal) {
-      totalLogged = totalFromSummary + sessionHours;
-    } else {
-      totalLogged = weeklyTotal + sessionHours;
-    }
+    const totalLogged = weeklyTotal + sessionHours;
     const totalToday = todayHours.reduce((a, b) => a + b, 0) + sessionHours;
     const remaining = 35 - totalLogged;
     if (!window.__chrono01_debug_logged) {
